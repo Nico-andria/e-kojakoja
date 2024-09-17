@@ -28,6 +28,8 @@ function App() {
       inputValue
     )}`;
 
+    console.log(paramType);
+
     setLoading(true); // Démarre le chargement
     setError(null);
     setData(null);
@@ -174,7 +176,12 @@ function App() {
 
                     <tr>
                       <td style={{ color: "#ff4732" }}>Date de départ</td>
-                      <td>: {formatDate(item.Départ)}</td>
+                      <td>
+                        :{" "}
+                        {item.Départ == "EN ATTENTE"
+                          ? "EN ATTENTE"
+                          : formatDate(item.Départ)}
+                      </td>
                     </tr>
 
                     <tr>
