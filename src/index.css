@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400..900&display=swap");
 * {
   margin: 0;
   padding: 0;
@@ -8,7 +8,7 @@
   font-family: pop;
   src: url(./Fonts/Poppins-Medium.ttf);
 }
-body{
+body {
   background-image: url("assets/bg.png");
   background-attachment: fixed;
   background-size: 100% 100%;
@@ -22,7 +22,6 @@ body{
   align-items: center;
   font-family: pop;
   flex-direction: column;
-  
 }
 .container {
   padding: 50px;
@@ -152,8 +151,8 @@ ul li:nth-last-of-type(1) .active {
 
 /* Responsive Css  */
 
-@media (max-width: 980px) and (min-width: 600px) {
-  .formulaire{
+@media (max-width: 980px) and (min-width: 100px) {
+  .formulaire {
     width: 350px;
   }
   /* .main{
@@ -199,9 +198,6 @@ ul li:nth-last-of-type(1) .active {
 }
 
 @media (max-width: 600px) {
-  /* .main{
-    height: 100%;
-  } */
   .head .head_1 {
     font-size: 24px;
   }
@@ -239,25 +235,18 @@ table tr td {
 }
 .info,
 .progression {
-  
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.progression{
+.progression {
   margin-top: -60px;
 }
-.error, .commentaire{
-  color:#dc3545;
+.error,
+.commentaire {
+  color: #dc3545;
   background-color: #f8d7da;
   padding: 10px;
   border-radius: 5px;
   margin-top: 20px;
 }
-/* .commentaire{
-  color:#ffc107;
-  background-color: #fff3cd;
-  padding: 10px;
-  border-radius: 5px;
-  margin-top: 20px;
-} */
