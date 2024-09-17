@@ -1,12 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./App.css";
-import moment from "moment";
-import "moment/locale/fr";
 import logoLong from "./assets/logo_long.png";
 import logo from "./assets/logo.png";
 
-// Configurer Moment.js pour utiliser la locale française
-moment.locale("fr");
 function App() {
   // État pour stocker la valeur de l'input
   const [inputValue, setInputValue] = useState("");
@@ -22,22 +18,6 @@ function App() {
 
   // État pour gérer le chargement
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // Exemple de date à formater
-    const date = "27/04/2024";
-
-    // Formater la date avec le format "DD/MM/YYYY"
-    const formattedDate = moment(date, "DD/MM/YYYY").format(
-      "dddd Do MMMM YYYY"
-    );
-
-    // Afficher la date formatée dans la console
-    console.log(formattedDate);
-
-    // Fonction de nettoyage vide (pas nécessaire ici mais peut être utilisé pour nettoyer les effets secondaires)
-    return () => {};
-  }, []);
 
   // Fonction pour récupérer les données
   const fetchData = (event) => {
@@ -65,6 +45,7 @@ function App() {
       })
       .catch((error) => {
         setError(error.message); // Met à jour l'état des erreurs
+        setError("Une erreur est survenue"); // Met à jour l'état des erreurs
         setData(null); // Réinitialise les données en cas d'erreur
         setLoading(false); // Arrête le chargement
       });
@@ -79,238 +60,310 @@ function App() {
     setParamType(event.target.value);
   };
 
+  // Fonction pour formater la date
+  const formatDate = (dateStr) => {
+    // Définir les options pour le formatage
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "long",
+    };
+
+    // Convertir la chaîne en un objet Date
+    const [day, month, year] = dateStr
+      .split("/")
+      .map((num) => parseInt(num, 10));
+    const date = new Date(year, month - 1, day); // mois-1 car en JavaScript, janvier est 0
+
+    // Formater la date en utilisant les options spécifiées
+    return date.toLocaleDateString("fr-FR", options);
+  };
+
+  // Fonction pour obtenir le label de l'envoi
+  const getEnvoiLabel = (envoi) => {
+    const labels = {
+      Maritime: "Maritime",
+      "Maritime -0,15m³": "Maritime -0,15m³",
+      "Maritime ML": "Maritime Marchandise Lourde",
+      "Air Normal": "Air Normal",
+      "Air Normal BAT": "Air Normal avec batterie",
+      "Air Normal P/L": "Air Normal Poudre/Liquide",
+      "Air Express": "Air Express",
+      "Air Express BAT": "Air Express avec batterie",
+      "Air Express P/L": "Air Express Poudre/Liquide",
+    };
+    return labels[envoi] || envoi; // Affiche la valeur par défaut si aucune condition n'est remplie
+  };
+
+  // Fonction pour formater les prix avec séparateurs de milliers
+  const formatPrice = (price) => {
+    if (price === undefined || price === null || isNaN(price)) {
+      return "";
+    }
+    return parseFloat(price).toLocaleString("fr-FR");
+  };
+
   return (
-    <>
-      <div className="main">
-        <div className="container">
-          <div className="head">
-            <p className="head_1">Service de tracking </p>
-            <img src={logoLong} width={"200px"} alt="logo" />
-          </div>
+    <div className="main">
+      <div className="container">
+        <div className="head">
+          <img src={logoLong} width={"350px"} alt="logo" />
+          <p className="head_1">Service de tracking </p>
+        </div>
 
-          <div className="formulaire">
-            <form onSubmit={fetchData}>
-              <label htmlFor="trackingNumber">
-                Écrivez votre tracking Number
-              </label>
-              <br />
-              <select
-                id="paramType"
-                value={paramType}
-                onChange={handleParamTypeChange}
+        <div className="formulaire">
+          <form onSubmit={fetchData}>
+            <br />
+            <select
+              id="paramType"
+              value={paramType}
+              onChange={handleParamTypeChange}
+            >
+              <option value="Tracking">Tracking Number</option>
+              <option value="Pseudo">Pseudo</option>
+              {/* Ajoutez d'autres options ici si nécessaire */}
+            </select>
+            <input
+              type="text"
+              placeholder="Entrez la valeur..."
+              id="inputValue"
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+            {loading ? (
+              <button type="button" disabled>
+                Chargement...
+              </button>
+            ) : (
+              <button type="submit">Rechercher</button>
+            )}
+          </form>
+        </div>
+
+        {error && <div className="error"> {error}</div>}
+        {loading && (
+          <>
+            <div className="loading">
+              <img src={logo} alt="Chargement..." width={"200px"} />
+            </div>
+          </>
+        )}
+
+        {/* Affichage des résultats si data est disponible */}
+        {data && data.length > 0 && (
+          <>
+            <div className="info">
+              <table
+                style={{
+                  color: "white",
+                  paddingTop: "30px",
+                }}
               >
-                <option value="Tracking">Tracking Number</option>
-                <option value="Pseudo">Pseudo</option>
-                {/* Ajoutez d'autres options ici si nécessaire */}
-              </select>
-              <input
-                type="text"
-                placeholder="Entrez la valeur..."
-                id="inputValue"
-                value={inputValue}
-                onChange={handleInputChange}
-              />
-              {loading ? (
-                <button type="button" disabled>
-                  Chargement...
-                </button>
-              ) : (
-                <button type="submit">Rechercher</button>
-              )}
-            </form>
-          </div>
+                {data.map((item) => (
+                  <>
+                    <tr>
+                      <td style={{ color: "#ff4732" }}>Pseudo</td>
+                      <td>: {item.Pseudo}</td>
+                    </tr>
 
-          {error && <p className="error">Erreur: {error}</p>}
-          {loading && (
-            <>
-              <div className="loading">
-                <img src={logo} alt="Chargement..." width={"200px"} />
-              </div>
-            </>
-          )}
+                    <tr>
+                      <td style={{ color: "#ff4732" }}>Tracking Number</td>
+                      <td>: {item.Tracking}</td>
+                    </tr>
 
-          {/* Affichage des résultats si data est disponible */}
-          {data && data.length > 0 && (
-            <>
-              <div className="info">
-                <table
-                  style={{
-                    color: "white",
-                    paddingTop: "50px",
-                  }}
-                >
-                  {data.map((item) => (
-                    <>
+                    <tr>
+                      <td style={{ color: "#ff4732" }}>Date de départ</td>
+                      <td>: {formatDate(item.Départ)}</td>
+                    </tr>
+
+                    <tr>
+                      <td style={{ color: "#ff4732" }}>Type d&apos;envoi</td>
+                      <td>: {getEnvoiLabel(item.Envoi)}</td>
+                    </tr>
+
+                    <tr>
+                      <td style={{ color: "#ff4732" }}>Date de réception</td>
+                      <td>: {formatDate(item.Réception)}</td>
+                    </tr>
+
+                    <tr>
+                      <td style={{ color: "#ff4732" }}>Tarif</td>
+                      <td>
+                        : {formatPrice(item.Tarif)}{" "}
+                        <span>
+                          {!item.Envoi.includes("Maritime")
+                            ? "Ariary / kg"
+                            : "$ / m³"}
+                        </span>
+                      </td>
+                    </tr>
+
+                    {item.Envoi.includes("Maritime") ? (
                       <tr>
-                        <td style={{ color: "#ff4732" }}>Tracking Number</td>
-                        <td>: {item.Tracking}</td>
-                      </tr>
-
-                      <tr>
-                        <td style={{ color: "#ff4732" }}>Date de départ</td>
-                        <td>: {item.Départ}</td>
-                      </tr>
-
-                      <tr>
-                        <td style={{ color: "#ff4732" }}>Type d&apos;envoi</td>
-                        <td>: {item.Envoi}</td>
-                      </tr>
-
-                      <tr>
-                        <td style={{ color: "#ff4732" }}>
-                          Date d&apos;arrivée
-                        </td>
-                        <td>: {item.Réception}</td>
-                      </tr>
-
-                      <tr>
-                        <td style={{ color: "#ff4732" }}>Tarif</td>
+                        <td style={{ color: "#ff4732" }}>Volume</td>
                         <td>
-                          : {item.Tarif}{" "}
-                          <span>
-                            {item.Envoi !== "Maritime"
-                              ? "Ariary / kg"
-                              : "$ / m3"}
-                          </span>
+                          : {item.Volume} m<sup>3</sup>
                         </td>
                       </tr>
+                    ) : (
+                      <tr>
+                        <td style={{ color: "#ff4732" }}>Poids</td>
+                        <td>: {item.Poids} kg</td>
+                      </tr>
+                    )}
 
-                      {item.Envoi == "Maritime" ? (
-                        <tr>
-                          <td style={{ color: "#ff4732" }}>Volume</td>
-                          <td>
-                            : {item.Volume} m<sup>3</sup>
-                          </td>
-                        </tr>
-                      ) : (
-                        <tr>
-                          <td style={{ color: "#ff4732" }}>Poids</td>
-                          <td>: {item.Poids}</td>
-                        </tr>
-                      )}
-
-                      {item.Envoi === "Maritime" ? (
-                        ""
-                      ) : (
-                        <tr>
-                          <td style={{ color: "#ff4732" }}>
-                            Poids volumétrique
-                          </td>
-                          <td>
-                            : {item.Poids_volumétrique} m<sup>3</sup>
-                          </td>
-                        </tr>
-                      )}
-                    </>
-                  ))}
-                </table>
-              </div>
-
-              {data.map((item, index) => (
-                <div className="progression" key={index}>
-                  <ul>
-                    <li>
-                      {" "}
-                      <i className="icon uil uil-clipboard-notes"></i>
-                      <div
-                        className={`progress one ${
-                          item.Statut == "ENTREPOT CHINE" ||
-                          item.Statut == "EN TRANSIT" ||
-                          item.Statut == "EN DOUANE" ||
-                          item.Statut == "ARRIVEE A MDG"
-                            ? "active"
-                            : ""
-                        }`}
-                      >
-                        <p>1</p>
-                        <i className="uil uil-check"></i>
-                      </div>
-                      <p className="text">Entrepôt Chine</p>
-                    </li>
-                    <li>
-                      {/* <i className="icon uil-plane"></i> */}
-                      <i
-                        className={`icon ${
-                          item.Envoi == "Maritime" ? "uil-ship" : "uil-plane"
-                        }`}
-                      ></i>
-                      <div
-                        className={`progress two ${
-                          (item.Statut == "EN TRANSIT" ||
-                            item.Statut == "EN DOUANE" ||
-                            item.Statut == "ARRIVEE A MDG") &&
-                          "active"
-                        }`}
-                      >
-                        <p>2</p>
-                        <i className="uil uil-check"></i>
-                      </div>
-                      <p className="text">En transit</p>
-                    </li>
-
-                    {/* en douane au port MDG */}
-                    {item.Envoi === "Maritime" ? (
-                      <li>
-                        <i
-                          className={`icon ${
-                            item.Envoi == "Maritime"
-                              ? "uil-store-alt"
-                              : "uil-plane"
-                          }`}
-                        ></i>
-                        <div
-                          className={`progress three ${
-                            (item.Statut == "EN DOUANE" ||
-                              item.Statut == "ARRIVEE A MDG") &&
-                            "active"
-                          }`}
-                        >
-                          <p>{item.Envoi === "Maritime" ? "3" : "2"}</p>
-                          <i className="uil uil-check"></i>
-                        </div>
-                        <p className="text">En Douane MDG</p>
-                      </li>
+                    {item.Poids_volumétrique ? (
+                      <tr>
+                        <td style={{ color: "#ff4732" }}>Poids volumétrique</td>
+                        <td>: {item.Poids_volumétrique} kg </td>
+                      </tr>
                     ) : (
                       ""
                     )}
 
+                    {!item.Commentaires ? (
+                      ""
+                    ) : (
+                      <tr>
+                        <td style={{ color: "#ff4732" }}>Commentaires</td>
+                        <td>
+                          <div className="commentaire">{item.Commentaires}</div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                ))}
+              </table>
+            </div>
+
+            {data.map((item, index) => (
+              <div className="progression" key={index}>
+                <ul>
+                  <li>
+                    {" "}
+                    <i className="icon uil uil-yen-circle"></i>
+                    <div
+                      className={`progress one ${
+                        item.Statut == "ACHAT EFFECTUE" ||
+                        item.Statut == "ENTREPOT CHINE" ||
+                        item.Statut == "EN TRANSIT" ||
+                        item.Statut == "EN DOUANE MDG" ||
+                        item.Statut == "ARRIVEE A MDG"
+                          ? "active"
+                          : ""
+                      }`}
+                    >
+                      <p>1</p>
+                      <i className="uil uil-check"></i>
+                    </div>
+                    <p className="text">Achat effectué</p>
+                  </li>
+
+                  <li>
+                    {/* <i className="icon uil-plane"></i> */}
+                    <i className="icon uil uil-clipboard-notes"></i>
+                    <div
+                      className={`progress two ${
+                        item.Statut == "ENTREPOT CHINE" ||
+                        item.Statut == "EN TRANSIT" ||
+                        item.Statut == "EN DOUANE MDG" ||
+                        item.Statut == "ARRIVEE A MDG"
+                          ? "active"
+                          : ""
+                      }`}
+                    >
+                      <p>2</p>
+                      <i className="uil uil-check"></i>
+                    </div>
+                    <p className="text">Entrepôt Chine</p>
+                  </li>
+
+                  <li>
+                    {/* <i className="icon uil-plane"></i> */}
+                    <i
+                      className={`icon ${
+                        item.Envoi.includes("Maritime")
+                          ? "uil-ship"
+                          : "uil-plane"
+                      }`}
+                    ></i>
+                    <div
+                      className={`progress two ${
+                        (item.Statut == "EN TRANSIT" ||
+                          item.Statut == "EN DOUANE MDG" ||
+                          item.Statut == "ARRIVEE A MDG") &&
+                        "active"
+                      }`}
+                    >
+                      <p>3</p>
+                      <i className="uil uil-check"></i>
+                    </div>
+                    <p className="text">En transit</p>
+                  </li>
+
+                  {/* EN DOUANE MDG au port MDG */}
+                  {item.Envoi.includes("Maritime") ? (
                     <li>
                       <i
-                        className="icon uil uil-map-marker"
-                        style={{
-                          color: `${
-                            item.Statut == "ARRIVEE A MDG" ? "#4caf50" : ""
-                          }`,
-                        }}
+                        className={`icon ${
+                          item.Envoi.includes("Maritime")
+                            ? "uil-store-alt"
+                            : "uil-plane"
+                        }`}
                       ></i>
                       <div
-                        className={`progress ${
-                          item.Envoi == "Maritime" && "four"
-                        } three ${item.Statut == "ARRIVEE A MDG" && "active"}`}
+                        className={`progress three ${
+                          (item.Statut == "EN DOUANE MDG" ||
+                            item.Statut == "ARRIVEE A MDG") &&
+                          "active"
+                        }`}
                       >
-                        <p>{item.Envoi === "Maritime" ? "4" : "3"}</p>
+                        <p>{item.Envoi.includes("Maritime") ? "4" : "3"}</p>
                         <i className="uil uil-check"></i>
                       </div>
-                      <p
-                        className="text"
-                        style={{
-                          color: `${
-                            item.Statut == "ARRIVEE A MDG" ? "#4caf50" : ""
-                          }`,
-                        }}
-                      >
-                        Colis arrivé
-                      </p>
-                      {/* <p className="text">Colis arrivé</p> */}
+                      <p className="text">En Douane MDG</p>
                     </li>
-                  </ul>
-                </div>
-              ))}
-            </>
-          )}
-        </div>
+                  ) : (
+                    ""
+                  )}
+
+                  <li>
+                    <i
+                      className="icon uil uil-map-marker"
+                      style={{
+                        color: `${
+                          item.Statut == "ARRIVEE A MDG" ? "#4caf50" : ""
+                        }`,
+                      }}
+                    ></i>
+                    <div
+                      className={`progress ${
+                        item.Envoi.includes("Maritime") && "four"
+                      } three ${item.Statut == "ARRIVEE A MDG" && "active"}`}
+                    >
+                      <p>{item.Envoi.includes("Maritime") ? "5" : "4"}</p>
+                      <i className="uil uil-check"></i>
+                    </div>
+                    <p
+                      className="text"
+                      style={{
+                        color: `${
+                          item.Statut == "ARRIVEE A MDG" ? "#4caf50" : ""
+                        }`,
+                      }}
+                    >
+                      Colis arrivé
+                    </p>
+                    {/* <p className="text">Colis arrivé</p> */}
+                  </li>
+                </ul>
+              </div>
+            ))}
+          </>
+        )}
       </div>
-    </>
+    </div>
   );
 }
 
