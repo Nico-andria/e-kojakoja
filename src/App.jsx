@@ -122,7 +122,7 @@ function App() {
               value={paramType}
               onChange={handleParamTypeChange}
             >
-              <option value="Tracking">Tracking Number</option>
+              <option value="Track">Track</option>
               <option value="Pseudo">Pseudo</option>
               {/* Ajoutez d'autres options ici si nécessaire */}
             </select>
