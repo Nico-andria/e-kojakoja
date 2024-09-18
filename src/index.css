@@ -31,6 +31,26 @@ body {
   background-color: rgba(89, 87, 80, 0.68);
   border-radius: 12px;
   border: 1px solid rgba(108, 105, 95, 0.68);
+  max-height: 90vh; /* Limite la hauteur de .container */
+  overflow-y: auto; /* Ajoute un défilement vertical si le contenu dépasse */
+}
+/* Styles de la barre de défilement pour les navigateurs basés sur WebKit (Chrome, Safari) */
+.container::-webkit-scrollbar {
+  width: 10px; /* Largeur de la barre de défilement */
+}
+
+.container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.2); /* Couleur de la piste */
+  border-radius: 10px; /* Coins arrondis de la piste */
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.5); /* Couleur du pouce */
+  border-radius: 10px; /* Coins arrondis du pouce */
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.8); /* Couleur du pouce au survol */
 }
 .formulaire {
   margin-top: 20px;
@@ -233,6 +253,7 @@ table tr td {
     transform: rotate(360deg); /* Fin de l'animation */
   }
 }
+
 .info,
 .progression {
   display: flex;
