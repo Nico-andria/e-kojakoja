@@ -8,7 +8,7 @@ function App() {
   const [inputValue, setInputValue] = useState("");
 
   // État pour stocker le type de paramètre sélectionné
-  const [paramType, setParamType] = useState("tracking");
+  const [paramType, setParamType] = useState("Tracking");
 
   // État pour stocker les données récupérées
   const [data, setData] = useState(null);
