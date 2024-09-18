@@ -8,7 +8,7 @@ function App() {
   const [inputValue, setInputValue] = useState("");
 
   // État pour stocker le type de paramètre sélectionné
-  const [paramType, setParamType] = useState("tracking");
+  const [paramType, setParamType] = useState("Tracking");
 
   // État pour stocker les données récupérées
   const [data, setData] = useState(null);
@@ -24,7 +24,7 @@ function App() {
     event.preventDefault(); // Empêche le comportement par défaut du formulaire
 
     // Construire l'URL en fonction du type de paramètre sélectionné
-    const url = `https://sheetdb.io/api/v1/qms48o92dvn20/search?${paramType}=${encodeURIComponent(
+    const url = `https://sheetdb.co/api/v1/qms48o92dvn20/search?${paramType}=${encodeURIComponent(
       inputValue
     )}`;
 
